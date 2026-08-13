@@ -1,21 +1,22 @@
-
+import logging
 import tkinter as tk
-
 from tkinter import filedialog
+
+log = logging.getLogger(__name__)
 
 
 def selecionar_arquivo():
-    """Essa função abre janelas do explorador de arquivos e permite a seleção das bases.
+    """Abre janela do explorador de arquivos para seleção do backlog.
 
     Returns:
-        tuple: Retorna (caminho_principal, caminho_automidia) ou (None, None) se cancelado.
+        str | None: Caminho do arquivo selecionado ou None se cancelado.
     """
     root = tk.Tk()
     root.withdraw()
     # Força a janela do explorador a abrir sempre à frente de outros programas
     root.attributes('-topmost', True)
 
-    caminho_principal = filedialog.askopenfilename(
+    caminho = filedialog.askopenfilename(
         title="Selecione o arquivo do backlog",
         filetypes=[
             ("Arquivos Excel", "*.xlsx *.xls *.xlsb"),
@@ -23,13 +24,10 @@ def selecionar_arquivo():
         ]
     )
 
-    # Se o usuário cancelar a primeira janela, aborta imediatamente
-    if not caminho_principal:
-        root.destroy()
-        return None, None
-    else:
-        print("Arquivo lido com sucesso")
-    
-    return caminho_principal
+    root.destroy()
 
-selecionar_arquivo()
+    if not caminho:
+        return None
+
+    log.info("Arquivo selecionado: %s", caminho)
+    return caminho
