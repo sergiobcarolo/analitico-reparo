@@ -1,0 +1,1 @@
+"""Retornar quantas ordens vão para injeção e quantas ordens vão para cancelamento"""
