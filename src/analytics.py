@@ -49,9 +49,14 @@ def gerar_resumo_gpon(df: pd.DataFrame) -> bool:
     """
     import config
 
+    # Converte para int para evitar exibição como float (ex: 3.0 → 3)
+    df_exib = df.copy()
+    df_exib[config.COL_AGING_STTS] = df_exib[config.COL_AGING_STTS].astype(int)
+    df_exib[config.COL_QTD_VISITA] = df_exib[config.COL_QTD_VISITA].astype(int)
+
     tabela = pd.crosstab(
-        df[config.COL_AGING_STTS],
-        df[config.COL_QTD_VISITA],
+        df_exib[config.COL_AGING_STTS],
+        df_exib[config.COL_QTD_VISITA],
         margins=True,
         margins_name="TOTAL",
     )
