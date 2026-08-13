@@ -1,1 +1,10 @@
-Criar um script que receba um arquivo excel, aplique filtros, gere analiticos e crie arquivos.
+vamos incrementar isso: essa primeira parte foi para ordens de metalico 
+e agora vou precisar desenvolver uma nova parte para ordens GPON da
+coluna CLASSIFICACAO, onde ele precisará entregar um analitico considerando 
+se como está a divisão entre a coluna AGING_STTS e a coluna QTD_VISITA
+(isso serve pra eu ver quais ordens estão com aging 2 e não tem nenhuma 
+visita, por exemplo), entregando um analitico disso e após mostrar esse 
+analitico, pergunta se quer gerar um arquivo chamado CANCELAMENTO_GPON, 
+onde vai retornar somente as ordens da coluna "ORDEM". ao rodar a 
+automação, ela deve abrir uma tela indicando qual tipo de caminho eu 
+vou seguir, os do METALICO SIEBEL ou esse do GPON(deixe tematico da vivo)

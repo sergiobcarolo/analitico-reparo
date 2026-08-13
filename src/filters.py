@@ -59,3 +59,45 @@ def filtrar_cancelamento(df: pd.DataFrame) -> pd.DataFrame:
     resultado = df[df[config.COL_QTD_VISITA] > config.LIMITE_INJECAO].copy()
     log.info("Ordens para cancelamento: %d", len(resultado))
     return resultado
+
+
+def aplicar_filtro_base_gpon(df: pd.DataFrame) -> pd.DataFrame:
+    """Aplica filtros para ordens GPON e remove duplicatas.
+
+    Filtros:
+        - CLASSIFICACAO == config.VALOR_CLASSIFICACAO_GPON
+        - Remoção de linhas inteiramente duplicadas.
+
+    Args:
+        df: DataFrame com os dados brutos do backlog.
+
+    Returns:
+        DataFrame filtrado e sem duplicatas.
+    """
+    df_filtrado = df[
+        df[config.COL_CLASSIFICACAO].str.upper().str.strip() == config.VALOR_CLASSIFICACAO_GPON
+    ].copy()
+
+    antes = len(df_filtrado)
+    df_filtrado = df_filtrado.drop_duplicates()
+    duplicatas = antes - len(df_filtrado)
+
+    log.info("Registros GPON após filtro: %d (removidas %d duplicatas)", len(df_filtrado), duplicatas)
+    return df_filtrado
+
+
+def filtrar_cancelamento_gpon(df: pd.DataFrame) -> pd.DataFrame:
+    """Retorna ordens GPON com QTD_VISITA >= config.LIMITE_CANCELAMENTO_GPON.
+
+    Args:
+        df: DataFrame já com filtro base GPON aplicado.
+
+    Returns:
+        DataFrame com colunas ORDEM e AGING_STTS.
+    """
+    resultado = df[
+        df[config.COL_QTD_VISITA] >= config.LIMITE_CANCELAMENTO_GPON
+    ][[config.COL_ORDEM, config.COL_AGING_STTS]].copy()
+
+    log.info("Ordens GPON para cancelamento: %d", len(resultado))
+    return resultado

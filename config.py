@@ -12,6 +12,11 @@ VALOR_CLASSIFICACAO = "METALICO"
 # ─── Limiar de Injeção ────────────────────────────────────────────────────────
 LIMITE_INJECAO     = 3      # QTD_VISITA <= LIMITE_INJECAO → injeção
 
+# ─── GPON ─────────────────────────────────────────────────────────────────────
+VALOR_CLASSIFICACAO_GPON = "GPON"
+COL_AGING_STTS           = "AGING_STTS"
+LIMITE_CANCELAMENTO_GPON = 4   # QTD_VISITA >= 4 → cancelamento GPON
+
 # ─── Slots de Horário ─────────────────────────────────────────────────────────
 SLOTS              = ["08:30-12:30", "12:30-18:00"]
 NUM_DATAS_UTEIS    = 3

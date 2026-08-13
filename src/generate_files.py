@@ -116,3 +116,21 @@ def gerar_arquivo_cancelamento(df: pd.DataFrame, pasta_saida: str) -> str:
 
     log.info("Arquivo de cancelamento gerado: %s (%d ordens)", caminho, len(df_saida))
     return caminho
+
+
+def gerar_arquivo_cancelamento_gpon(df: pd.DataFrame, pasta_saida: str) -> str:
+    """Gera o arquivo CANCELAMENTO_GPON.xlsx com colunas ORDEM e AGING_STTS.
+
+    Args:
+        df: DataFrame filtrado com ordens GPON para cancelamento
+            (QTD_VISITA >= config.LIMITE_CANCELAMENTO_GPON).
+        pasta_saida: Caminho da pasta onde o arquivo será salvo.
+
+    Returns:
+        Caminho completo do arquivo gerado.
+    """
+    caminho = os.path.join(pasta_saida, "CANCELAMENTO_GPON.xlsx")
+    df.to_excel(caminho, sheet_name="CANCELAMENTO_GPON", index=False)
+
+    log.info("Arquivo CANCELAMENTO_GPON gerado: %s (%d ordens)", caminho, len(df))
+    return caminho
