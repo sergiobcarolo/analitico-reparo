@@ -1,10 +1,10 @@
-vamos incrementar isso: essa primeira parte foi para ordens de metalico 
-e agora vou precisar desenvolver uma nova parte para ordens GPON da
-coluna CLASSIFICACAO, onde ele precisará entregar um analitico considerando 
-se como está a divisão entre a coluna AGING_STTS e a coluna QTD_VISITA
-(isso serve pra eu ver quais ordens estão com aging 2 e não tem nenhuma 
-visita, por exemplo), entregando um analitico disso e após mostrar esse 
-analitico, pergunta se quer gerar um arquivo chamado CANCELAMENTO_GPON, 
-onde vai retornar somente as ordens da coluna "ORDEM". ao rodar a 
-automação, ela deve abrir uma tela indicando qual tipo de caminho eu 
-vou seguir, os do METALICO SIEBEL ou esse do GPON(deixe tematico da vivo)
+Vamos alterar todo o contexto dessa automação. ainda deverá abrir uma tela permitindo a seleção de
+dois arquivos: GPON e METALICO. a partir deles, deverá ser criado o arquivo chamado INJECAO e a aba deverá ser chamada de INJECAO também. os nomes das colunas do arquivo INJECAO permanecerão iguais. 
+as regras para as ordens validas do arquivo GPON são: coluna CLASSIFICACAO com o valor "GPON" e coluna SISTEMA com o valor "SIEBEL"; coluna AGING_STTS maior ou igual a 1 e coluna QTD_VISITA menor ou igual a 3
+agora para o arquivo do metalico: coluna CLASSIFICACAO com o valor "METALICO" e coluna SISTEMA com o valor "SIEBEL"; QTD_VISITA menor ou igual a 3.
+as ordens que serão adicionadas no arquivo INJECAO do GPON deverá seguir essa ordem: 30% para hoje(na coluna DT_AGENDA) e no slot da tarde(12:30-18:00) e os outros 70% divididos entre o dia seguinte no slot da manhã e tarde (08:30-12:30 e 12:30-18:00) sem se preocupar com feriados ou finais de semana nos dias posteriores
+agora para o METALICO, a regra pode permanecer igual já está(tres dias sequencias intercalados entre os slots e não podendo agendar em feriados ou finais de semana)
+
+para as ordens em ambos os arquivo que a QTD_VISITA for maior ou igual a 4 deverá ser gerado um arquivo unificado contendo as ordens e qual a CLASSIFICACAO.
+
+

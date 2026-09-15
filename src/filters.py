@@ -97,7 +97,7 @@ def filtrar_cancelamento_gpon(df: pd.DataFrame) -> pd.DataFrame:
     """
     resultado = df[
         df[config.COL_QTD_VISITA] >= config.LIMITE_CANCELAMENTO_GPON
-    ][[config.COL_ORDEM, config.COL_AGING_STTS]].copy()
+    ][[config.COL_ORDEM, config.COL_QTD_VISITA]].copy()
 
     antes = len(resultado)
     resultado = resultado.drop_duplicates()
