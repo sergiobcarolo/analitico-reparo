@@ -4,73 +4,61 @@ import pandas as pd
 log = logging.getLogger(__name__)
 
 
-def gerar_resumo(df_injecao: pd.DataFrame, df_cancelamento: pd.DataFrame) -> dict:
-    """Imprime e retorna um resumo com a quantidade de ordens por destino.
+def gerar_resumo_consolidado(
+    df_gpon_inj: pd.DataFrame,
+    df_met_inj: pd.DataFrame,
+    df_excedentes: pd.DataFrame,
+) -> dict:
+    """Imprime e retorna o painel analítico consolidado da automação.
 
     Args:
-        df_injecao: DataFrame com ordens filtradas para injeção.
-        df_cancelamento: DataFrame com ordens filtradas para cancelamento.
+        df_gpon_inj: DataFrame com ordens GPON para injeção.
+        df_met_inj: DataFrame com ordens METÁLICO para injeção.
+        df_excedentes: DataFrame unificado com ordens de >= 4 visitas.
 
     Returns:
-        dict com chaves 'injecao', 'cancelamento' e 'total'.
-    """
-    qtd_injecao = len(df_injecao)
-    qtd_cancelamento = len(df_cancelamento)
-    total = qtd_injecao + qtd_cancelamento
-
-    separador = "=" * 40
-    log.info(separador)
-    log.info("         RESUMO ANALÍTICO")
-    log.info(separador)
-    log.info("  Ordens para INJEÇÃO:      %d", qtd_injecao)
-    log.info("  Ordens para CANCELAMENTO: %d", qtd_cancelamento)
-    log.info("  TOTAL:                    %d", total)
-    log.info(separador)
-
-    return {
-        "injecao": qtd_injecao,
-        "cancelamento": qtd_cancelamento,
-        "total": total,
-    }
-
-
-def gerar_resumo_gpon(df: pd.DataFrame) -> bool:
-    """Exibe tabela cruzada AGING_STTS × QTD_VISITA e pergunta se deseja gerar arquivo.
-
-    A tabela mostra a quantidade de ordens para cada combinação de
-    AGING_STTS (linhas) e QTD_VISITA (colunas), permitindo identificar
-    ordens com aging alto e sem visitas, por exemplo.
-
-    Args:
-        df: DataFrame GPON já com filtro base aplicado.
-
-    Returns:
-        True se o usuário deseja gerar o arquivo CANCELAMENTO_GPON, False caso contrário.
+        dict com as métricas quantitativas do processamento.
     """
     import config
 
-    # Converte para int para evitar exibição como float (ex: 3.0 → 3)
-    df_exib = df.copy()
-    df_exib[config.COL_AGING_STTS] = df_exib[config.COL_AGING_STTS].astype(int)
-    df_exib[config.COL_QTD_VISITA] = df_exib[config.COL_QTD_VISITA].astype(int)
+    total_gpon_inj = len(df_gpon_inj)
+    total_met_inj  = len(df_met_inj)
+    total_injecao  = total_gpon_inj + total_met_inj
 
-    tabela = pd.crosstab(
-        df_exib[config.COL_AGING_STTS],
-        df_exib[config.COL_QTD_VISITA],
-        margins=True,
-        margins_name="TOTAL",
-    )
+    # Contagem de excedentes por classificação
+    qtd_gpon_exc = 0
+    qtd_met_exc  = 0
+    if not df_excedentes.empty and config.COL_CLASSIFICACAO in df_excedentes.columns:
+        classificacoes = df_excedentes[config.COL_CLASSIFICACAO].astype(str).str.upper().str.strip()
+        qtd_gpon_exc = int((classificacoes == config.VALOR_CLASSIFICACAO_GPON).sum())
+        qtd_met_exc  = int((classificacoes == config.VALOR_CLASSIFICACAO_MET).sum())
 
-    separador = "=" * 60
+    total_excedentes = len(df_excedentes)
+    total_geral      = total_injecao + total_excedentes
+
+    separador = "=" * 55
     log.info(separador)
-    log.info("    ANALÍTICO GPON — AGING_STTS × QTD_VISITA")
+    log.info("           RESUMO ANALÍTICO CONSOLIDADO")
     log.info(separador)
-    print()
-    print(tabela.to_string())
-    print()
-    log.info(separador)
-    log.info("  Total de ordens GPON: %d", len(df))
+    log.info("  ORDENS PARA INJEÇÃO:")
+    log.info("    - GPON:                             %d", total_gpon_inj)
+    log.info("    - METÁLICO:                         %d", total_met_inj)
+    log.info("    * Subtotal Injeção:                 %d", total_injecao)
+    log.info("  -----------------------------------------------------")
+    log.info("  ORDENS COM VISITAS >= 4 (CANCELAMENTO):")
+    log.info("    - GPON:                             %d", qtd_gpon_exc)
+    log.info("    - METÁLICO:                         %d", qtd_met_exc)
+    log.info("    * Subtotal Cancelamento:            %d", total_excedentes)
+    log.info("  =====================================================")
+    log.info("  TOTAL DE ORDENS PROCESSADAS:          %d", total_geral)
     log.info(separador)
 
-    resposta = input("\nDeseja gerar o arquivo CANCELAMENTO_GPON? (s/n): ").strip().lower()
-    return resposta in ("s", "sim", "y", "yes")
+    return {
+        "gpon_injecao": total_gpon_inj,
+        "metalico_injecao": total_met_inj,
+        "total_injecao": total_injecao,
+        "gpon_excedentes": qtd_gpon_exc,
+        "metalico_excedentes": qtd_met_exc,
+        "total_excedentes": total_excedentes,
+        "total_geral": total_geral,
+    }
